@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Email Agent Workshop
 
-## Getting Started
+Build a personal AI Email Agent that automatically processes, labels, and drafts responses to incoming messages. You'll create the agent with Next.js, TypeScript, the Vercel AI SDK, and Neon Postgres.
 
-First, run the development server:
+By the end of the workshop, you'll have a fully working email assistant and gain practical experience building AI features you can include in future projects.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+When it comes to assumptions & prerequisites, workshop attendees should have:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Knowledge of git, building APIs, and writing server-side code with JavaScript/TypeScript
+- Familiarity with command-line tools and installing Node.js packages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The workshop focuses exclusively on backend development and AI integration, so no frontend experience is required
 
-## Learn More
+## Workshop Structure
 
-To learn more about Next.js, take a look at the following resources:
+The workshop combines two types of activities:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Conceptual overview: Explanations of key ideas you'll need to understand.
+- Hands-on exercises: Guided activities where you'll apply what you've learned, with helpful code snippets provided.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Workshop outline
 
-## Deploy on Vercel
+- Introduction
+- Exercise #0: Set up your development environment
+- Conceptual Overview: Building an AI Workflow
+- Exercise #1: Create an AI workflow with the AI SDK by Vercel, Neon Postgres, and Drizzle ORM
+- Conceptual Overview: Webhooks
+- Exercise #2: Set up webhooks for testing
+- Conceptual Overview: Google Apps Scripts
+- Exercise #3: Set up Google Apps Scripts to forward email threads
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Introduction
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you've used AI apps like ChatGPT, Claude, Le Chat, Google Gemini, or others, you'll notice that they all offer a similar user experience where you:
+
+1. Initiate a conversation
+2. Only do one task at a time
+
+AI Agents are the next evolution of AI apps. Since they will allow you to delegate tasks to an AI and have them done in the background.
+
+Some example use cases of AI Agents are:
+
+- Coding
+- Support
+- Deep Research
+
+There's also a lot of potential for personal AI agents. This workshop will show you how to build a personal AI Email Agent that automatically processes, labels, and summarizes incoming emails.
+
+The goal of this workshop is to give you a solid foundation to build your own AI Agents. The concepts you'll learn can be applied to other AI Agent projects.
+
+## Exercise #0: Set up your development environment
+
+To follow along, visit the workshop repository and click on the "Code" button to open the repository in GitHub Codespaces.
+
+### Project Overview
