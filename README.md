@@ -247,3 +247,5 @@ function processRecentEmails() {
 - Click “Add Trigger”
 - Choose the `processRecentEmails` function
 - Select type of time based trigger to be “Minutes Timer” and have it run every minute
+
+and that's it! Your Google Apps Script is now set up to forward emails to your webhook endpoint.
