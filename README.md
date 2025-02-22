@@ -20,13 +20,6 @@ The workshop combines two types of activities:
 - Conceptual overview: Explanations of key ideas you'll need to understand.
 - Hands-on exercises: Guided activities where you'll apply what you've learned, with helpful code snippets provided.
 
-## Workshop outline
-
-1. Set up your development environment
-2. Build an AI workflow with the Vercel AI SDK
-3. Create a Google Apps Script to forward emails to your API
-4. Test the email agent with a sample email
-
 ## Introduction
 
 If you've used AI apps like ChatGPT, Claude, Le Chat, Google Gemini, or others, you'll notice that they all offer a similar user experience where you:
@@ -50,12 +43,21 @@ The goal of this workshop is to give you a solid foundation to build your own AI
 
 The email agent will work as follows:
 
-- Google Apps Script will check for new emails and forward them to an API endpoint
+- [Google Apps Script](https://script.google.com) will check for new emails and forward them to an API endpoint
 - Incoming emails will be processed using the Vercel AI SDK and the result will be stored in a database on Neon
+
+<- Diagram of the email agent workflow ->
 
 ## Exercise: Set up your development environment
 
-To follow along, switch to the "start" branch and click on the "Code" button to open the repository in GitHub Codespaces. Rename the `.env.example` file to `.env` and start the development server by running `npm run dev`
+To follow along:
+
+1. Switch to the "start" branch and click on the "Code" button to open the repository in GitHub Codespaces.
+2. Rename the `.env.example` file to `.env` and set a random value for the `WEBHOOK_SECRET` variable.
+3. Install the dependencies by running `npm install`
+4. start the development server by running `npm run dev`
+
+You should see the Next.js app running on [`http://localhost:3000`](http://localhost:3000).
 
 ### Project Overview
 
@@ -69,11 +71,14 @@ The webhook route handler implemented in `/src/app/api/webhooks/agent/route.ts` 
 
 Webhooks are a way for one application to send real-time data to another application. They are commonly used in APIs to notify other systems about events or updates.
 
-When you're developing locally, you can use a service like smee.io to proxy your local webhooks to the internet. This allows you to receive webhooks from external services on your local machine.
+- Stripe: When a payment is made, Stripe sends a webhook to your server to update the payment status.
+- GitHub: When you push code to a repository, GitHub sends a webhook to your CI/CD system to trigger a build.
+
+When you're developing locally, you can use a service like [smee.io](https://smee.io) to proxy your local webhooks to the internet. This allows you to receive webhooks from external services on your local machine.
 
 ## Exercise: Set up webhooks for testing
 
-1. Go to smee.io
+1. Go to [smee.io](https://smee.io)
 1. Create a new channel
 1. Update the `dev:webhook` script in your package.json with your URL
 1. Run the following two commands:
