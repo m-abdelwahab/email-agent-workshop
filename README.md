@@ -84,10 +84,10 @@ https://username:password@your-webhook-url.com/api/webhook
 1. Go to [smee.io](https://smee.io)
 1. Create a new channel
 1. Update the `dev:webhook` script in your package.json with your URL
-1. Run the following two commands in separate terminals:
+1. Run the following two commands in two separate terminal windows:
 
 - `npm run dev` to start the app server
-- `npm run dev:webhook` to start proxying localhost
+- `npm run dev:webhook` to start proxying localhost. This command will forward requests made to this URL to `http://localhost:3000/api/webhooks/email`
 
 1. Go to Postmark, you can sign up for free using a work email
 1. Create a new server
