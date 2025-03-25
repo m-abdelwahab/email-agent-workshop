@@ -8,7 +8,6 @@ export const messages = pgTable("messages", {
   to: text("to").notNull(),
   date: text("date").notNull(),
   body: text("body").notNull(),
-  attachments: text("attachments").notNull(),
   createdAt: timestamp("created_at")
     .notNull()
     .default(sql`now()`),

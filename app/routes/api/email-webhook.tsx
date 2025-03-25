@@ -12,15 +12,6 @@ const emailSchema = z.object({
   To: z.string(),
   Date: z.string(),
   TextBody: z.string(),
-  Attachments: z.array(
-    z.object({
-      ContentLength: z.number().optional(),
-      Name: z.string().optional(),
-      ContentType: z.string().optional(),
-      ContentID: z.string().optional(),
-      Content: z.string().optional(),
-    }),
-  ),
 });
 
 export async function action({ request }: Route.ActionArgs) {
@@ -74,7 +65,6 @@ export async function action({ request }: Route.ActionArgs) {
         from: validatedData.From,
         to: validatedData.To,
         body: validatedData.TextBody,
-        attachments: JSON.stringify(validatedData.Attachments),
         summary: result.object.summary,
         labels: result.object.labels,
         date: validatedData.Date,

@@ -5,7 +5,6 @@ CREATE TABLE "messages" (
 	"to" text NOT NULL,
 	"date" text NOT NULL,
 	"body" text NOT NULL,
-	"attachments" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"summary" text NOT NULL,
