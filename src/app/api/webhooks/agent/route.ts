@@ -6,31 +6,49 @@ import { db } from "~/lib/db";
 import { messages } from "~/lib/db/schema";
 
 const emailSchema = z.object({
-  id: z.string(),
-  subject: z.string(),
-  from: z.string(),
-  to: z.string(),
-  date: z.string(),
-  body: z.string(),
-  attachments: z.array(
-    z.object({ name: z.string(), type: z.string(), size: z.number() }),
+  MessageID: z.string(),
+  Subject: z.string(),
+  From: z.string(),
+  To: z.string(),
+  Date: z.string(),
+  TextBody: z.string(),
+  Attachments: z.array(
+    z.object({
+      ContentLength: z.number().optional(),
+      Name: z.string().optional(),
+      ContentType: z.string().optional(),
+      ContentID: z.string().optional(),
+      Content: z.string().optional(),
+    }),
   ),
 });
 
 export async function POST(request: Request) {
   try {
-    const secret = request.headers.get("X-Webhook-Secret");
+    /**The Webhook URL should be https://username:password@yourdomain.com/api/webhooks/agent,
+      1. Postmark will include an Authorization header containing the Base64-encoded username and password.
+      2. The server decodes the credentials and verifies them.
+      3. If the credentials are valid, access is granted; otherwise, the request is denied.
+    **/
+    const authHeader = request.headers.get("authorization");
 
-    if (!secret) {
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
       return NextResponse.json(
         { error: "Missing signature header" },
         { status: 401 },
       );
     }
 
-    const webhookSecret = process.env.WEBHOOK_SECRET;
+    const base64Credentials = authHeader.split(" ")[1];
+    const credentials = Buffer.from(base64Credentials, "base64").toString(
+      "utf-8",
+    );
+    const [username, password] = credentials.split(":");
 
-    if (secret !== webhookSecret) {
+    if (
+      username !== process.env.WEBHOOK_USERNAME ||
+      password !== process.env.WEBHOOK_PASSWORD
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -38,28 +56,30 @@ export async function POST(request: Request) {
 
     const validatedData = emailSchema.parse(body);
 
+    const prompt = `Generate a summary and labels for the following email: ${JSON.stringify(
+      validatedData,
+    )}. The summary should be a 1-2 sentences and only generate 1-2 labels that are relevant to the email.`;
+
     const result = await generateObject({
       model: openai("gpt-4o-2024-08-06", { structuredOutputs: true }),
       schemaName: "email",
       schemaDescription: "An email summary.",
       schema: z.object({ summary: z.string(), labels: z.array(z.string()) }),
-      prompt: `Generate a summary and labels for the following email: ${JSON.stringify(
-        validatedData,
-      )}. The summary should be a 1-2 sentences and only generate 1-2 labels that are relevant to the email.`,
+      prompt,
     });
 
     await db
       .insert(messages)
       .values({
-        id: validatedData.id,
-        subject: validatedData.subject,
-        from: validatedData.from,
-        to: validatedData.to,
-        body: validatedData.body,
-        attachments: JSON.stringify(validatedData.attachments),
+        id: validatedData.MessageID,
+        subject: validatedData.Subject,
+        from: validatedData.From,
+        to: validatedData.To,
+        body: validatedData.TextBody,
+        attachments: JSON.stringify(validatedData.Attachments),
         summary: result.object.summary,
         labels: result.object.labels,
-        date: validatedData.date,
+        date: validatedData.Date,
       })
       .onConflictDoNothing({ target: messages.id });
 
