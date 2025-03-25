@@ -1,8 +1,23 @@
 # Email Agent Workshop
 
-Build a personal AI Email Agent that automatically processes, labels, and drafts responses to incoming messages. You'll create the agent with Next.js, TypeScript, the Vercel AI SDK, and Neon Postgres.
+## Introduction
 
-By the end of the workshop, you'll have a fully working email assistant and gain practical experience building AI features you can include in future projects.
+If you've used AI apps like ChatGPT, Claude, Le Chat, Google Gemini, or others, you'll notice that they all offer a similar user experience where you:
+
+1. Initiate a conversation
+2. Only do one task at a time
+
+AI Agents are the next evolution of AI apps. They are systems that independently accomplish tasks in the background on behalf of users.
+
+Some example use cases of AI Agents are:
+
+- Coding
+- Support
+- Deep Research
+
+There's also a lot of potential for _personal_ AI agents. This workshop will show you how to build one that automatically labels and summarizes incoming messages. The goal of this workshop is to give you a solid foundation to build your own AI Agents. The concepts you'll learn can be applied to other AI Agent projects.
+
+You'll create the app with React router, TypeScript, Postmark, the Vercel AI SDK, and Neon Postgres. By the end of the workshop, you'll have a fully working email assistant and gain practical experience building AI features you can include in future projects.
 
 ## Prerequisites
 
@@ -20,31 +35,12 @@ The workshop combines two types of activities:
 - Conceptual overview: Explanations of key ideas you'll need to understand.
 - Hands-on exercises: Guided activities where you'll apply what you've learned, with helpful code snippets provided.
 
-## Introduction
-
-If you've used AI apps like ChatGPT, Claude, Le Chat, Google Gemini, or others, you'll notice that they all offer a similar user experience where you:
-
-1. Initiate a conversation
-2. Only do one task at a time
-
-AI Agents are the next evolution of AI apps. Since they will allow you to delegate tasks to an AI and have them done in the background.
-
-Some example use cases of AI Agents are:
-
-- Coding
-- Support
-- Deep Research
-
-There's also a lot of potential for personal AI agents. This workshop will show you how to build a personal AI Email Agent that automatically processes, labels, and summarizes incoming emails.
-
-The goal of this workshop is to give you a solid foundation to build your own AI Agents. The concepts you'll learn can be applied to other AI Agent projects.
-
 ## How the email agent will work
 
 The email agent will work as follows:
 
-- [Google Apps Script](https://script.google.com) will check for new emails and forward them to an API endpoint
-- Incoming emails will be processed using the Vercel AI SDK and the result will be stored in a database on Neon
+1. Postmark can automatically parse inbound messages and post the full details to a webhook endpoint you specify. They give you a pre-made inbound address (or you can set one up with your own domain)
+2. Incoming emails will be processed using the Vercel AI SDK, and the result will be stored in a database on Neon
 
 <- Diagram of the email agent workflow ->
 
@@ -53,19 +49,19 @@ The email agent will work as follows:
 To follow along:
 
 1. Switch to the "start" branch and click on the "Code" button to open the repository in GitHub Codespaces.
-2. Rename the `.env.example` file to `.env` and set a random value for the `WEBHOOK_SECRET` variable.
+2. Rename the `.env.example` file to `.env`.
 3. Install the dependencies by running `npm install`
 4. start the development server by running `npm run dev`
 
-You should see the Next.js app running on [`http://localhost:3000`](http://localhost:3000).
+You should see the app running on [`http://localhost:3000`](http://localhost:3000).
 
 ### Project Overview
 
-The project is a Next.js app that uses the Vercel AI SDK, Neon Postgres, and Drizzle ORM to build an AI workflow that processes incoming emails.
+The project is a fullstack React Router app that uses the Vercel AI SDK, Neon Postgres, and Drizzle ORM to build an AI workflow that processes incoming emails.
 
-The `/src/app/page.tsx` file contains the main page component that displays the email data. The page fetches the email data from the database and renders it.
+The `/app/routes/home.tsx` file contains the main page component that displays the email data. The page fetches the email data from the database on the server and renders it.
 
-The webhook route handler implemented in `/src/app/api/webhooks/agent/route.ts` functions as the primary endpoint for email data processing.
+The webhook endpoint implemented in `/app/routes/api/email-webhook.tsx` functions as the primary endpoint for email data processing.
 
 ## Conceptual Overview: What are webhooks?
 
@@ -74,179 +70,133 @@ Webhooks are a way for one application to send real-time data to another applica
 - Stripe: When a payment is made, Stripe sends a webhook to your server to update the payment status.
 - GitHub: When you push code to a repository, GitHub sends a webhook to your CI/CD system to trigger a build.
 
-When you're developing locally, you can use a service like [smee.io](https://smee.io) to proxy your local webhooks to the internet. This allows you to receive webhooks from external services on your local machine.
+Webhooks require a public URL that can receive incoming requests. To test webhooks locally, you can use a service like [smee.io](https://smee.io) to proxy requests to your local machine. This allows you to receive webhooks from external services on your local machine.
 
-## Exercise: Set up webhooks for testing
+Since the webhook URL is public, it's essential to secure it. One common way to secure webhooks is to use a secret key. The secret key is sent with the webhook request, and the receiving server validates it before processing the request. Postmark, the email service we'll use, supports basic auth for securing webhooks. You can set a username and password to secure the webhook endpoint and in your code , here's an example:
 
+```bash
+https://username:password@your-webhook-url.com/api/webhook
+```
+
+## Exercise: Set up email webhooks with Postmark
+
+1. Update the `.env` file you set up in the previous step with a username and password
 1. Go to [smee.io](https://smee.io)
 1. Create a new channel
 1. Update the `dev:webhook` script in your package.json with your URL
-1. Run the following two commands:
+1. Run the following two commands in separate terminals:
 
-- `npm run dev` to start the Next.js server
+- `npm run dev` to start the app server
 - `npm run dev:webhook` to start proxying localhost
+
+1. Go to Postmark, you can sign up for free using a work email
+1. Create a new server
+1. In your newly created server, go to the Default inbound stream
+1. Go to settings tab and in the "Webhook" section, add your smee.io URL while including the username and password you set in your `.env` file for basic auth.
+1. In the settings tab under the "Inbound" section, you'll find you inbound email addres.
+1. Send a test email to the inbound address Postmark provides. You should see the output in your terminal.
 
 ## Conceptual Overview: Building an AI Workflow
 
-The initial configuration establishes a strict schema definition that enforces the expected email data structure.
+Companies such as OpenAI and Anthropic (providers) offer access to a range of large language models (LLMs) with differing strengths and capabilities through their own APIs.
 
-Upon receiving a request, the system extracts the X-Webhook-Secret header and performs a comparison against the environment-configured secret. Any requests failing this validation trigger an immediate 401 unauthorized response.
+Each provider typically has its own unique method for interfacing with their models, complicating the process of switching providers and increasing the risk of vendor lock-in.
 
-Next, the AI SDK will be used to generate an object that contains the label and summary. We then store the email data in the database using Drizzle ORM and return a 200 OK response.
+To solve these challenges, you can leverage the AI SDK by Vercel. It offers a standardized approach to interacting with LLMs through a language model specification that abstracts differences between providers. This unified interface allows you to switch between providers with ease while using the same API for all providers.
+
+Many language models are capable of generating structured data, often defined as using "JSON modes" or "tools". However, you need to manually provide schemas and then validate the generated data as LLMs can produce incorrect or incomplete structured data.
+
+The AI SDK standardises structured object generation across model providers with the `generateObject` function. You can use Zod schemas, Valibot, or JSON schemas to specify the shape of the data that you want, and the AI model will generate data that conforms to that structure. You can also specify different output strategies, e.g. array, object, or no-schema
+
+Here's an example:
+
+```typescript
+import { openai } from "@ai-sdk/openai"; // access OpenAI's language models
+import { generateObject } from "ai"; // create structured data from AI responses
+import { z } from "zod"; // schema definition and validation
+
+// Define a schema for a recipe
+const schema = z.object({
+  recipe: z.object({
+    name: z.string(),
+    ingredients: z.array(z.string()),
+    steps: z.array(z.string()),
+  }),
+});
+
+const result = await generateObject({
+  model: openai("gpt-4-turbo"),
+  schema,
+  prompt: "Generate a lasagna recipe.",
+});
+
+console.log(JSON.stringify(result.object, null, 2));
+```
+
+In the webhook endpoint, we'll process incoming emails using the Vercel AI SDK. The SDK will generate structured data from the email content, which we'll then store in a database on Neon.
 
 ## Exercise: Create an AI workflow with the AI SDK by Vercel
 
-1. Go to platform.openai.com and generate an API Key
+1. Go to [platform.openai.com](https://platform.openai.com) and generate an API Key
 
 - New account -> generate an API key during onboarding
 - Existing account -> Settings > API Keys > create new secret key
 
-2. Go to the route handler in `/src/app/api/webhooks/agent/route.ts` and use the `generateObject` function to generate a structured output which will be stored in the database.
+2. Update the `.env` file with the API key. The AI SDK by Vercel uses the `OPENAI_API_KEY` environment variable to authenticate with OpenAI.
 
-https://sdk.vercel.ai/docs/reference/ai-sdk-core/generate-object
+```bash
+# .env
+OPENAI_API_KEY=your-api-key
+```
+
+3. Go to the API endpoint in `/app/routes/api/email-webhook.tsx` and use the `generateObject` function to generate a structured output. Use console.log to see the output.
+
+- [`generateObject` API reference](https://vercel.com/docs/api-reference/ai/generate-object)
+
+4. Send a test email to your Postmark inbound address. You should see the output in your terminal.
 
 <details>
-
-<summary>Click to see the solution</summary>
-
-```ts
-// code above unchanged
-
-const result = await generateObject({
-  model: openai("gpt-4o-2024-08-06", { structuredOutputs: true }),
-  schemaName: "email",
-  schemaDescription: "An email summary.",
-  schema: z.object({ summary: z.string(), labels: z.array(z.string()) }),
-  prompt: `Generate a summary and labels for the following email: ${JSON.stringify(
-    validatedData,
-  )}. The summary should be a 1-2 sentences and only generate 1-2 labels that are relevant to the email.`,
-});
-
-await db
-  .insert(messages)
-  .values({
-    id: validatedData.id,
-    subject: validatedData.subject,
-    from: validatedData.from,
-    to: validatedData.to,
-    body: validatedData.body,
-    attachments: JSON.stringify(validatedData.attachments),
-    summary: result.object.summary,
-    labels: result.object.labels,
-    date: validatedData.date,
-  })
-  .onConflictDoNothing({ target: messages.id });
-
-return NextResponse.json({
-  status: "success",
-  data: {
-    email: validatedData,
-    summary: result.object.summary,
-    labels: result.object.labels,
-  },
-});
-
-// rest of the code
-```
-
-## Conceptual Overview: Google Apps Scripts
-
-Google Apps Script is a cloud-based scripting language that allows you to automate tasks across Google products and third-party services. It's based on JavaScript and can be used to create custom functions, automate workflows, and interact with external APIs.
-
-In this workshop, we'll use Google Apps Script to create a script that checks for new emails in your Gmail account and forwards them to a webhook endpoint. There will then be a trigger that runs the script at regular intervals to check for new emails and forward them.
-
-## Exercise: Automated email forwarding using Google Apps Script
-
-1. Go to script.google.com and create a new project
-2. Copy the following snippet and update the `WEBHOOK_URL` and `WEBHOOK_SECRET` values. Make sure that they match the values you're using in your project.
-
-```js
-function processRecentEmails() {
-  const secondsSinceEpoch = (date) => Math.floor(date.getTime() / 1000);
-
-  const before = new Date(); // current time
-  const after = new Date();
-  after.setMinutes(before.getMinutes() - 2); // 2 minutes before current time
-
-  const searchQuery = `after:${secondsSinceEpoch(after)} before:${secondsSinceEpoch(before)}`;
-
-  const threads = GmailApp.search(searchQuery);
-
-  // Return if no new emails
-  if (threads.length === 0) {
-    console.log("No new emails in the last 2 minutes");
-    return;
-  }
-
-  // Your webhook configuration
-  const WEBHOOK_URL = "<YOUR_WEBHOOK_URL>";
-  const WEBHOOK_SECRET = "<YOUR_WEBHOOK_SECRET>";
-
-  // Process each thread
-  threads.forEach((thread) => {
-    const messages = thread.getMessages();
-
-    messages.forEach((message) => {
-      // Create email payload
-      const emailData = {
-        id: message.getId(),
-        subject: message.getSubject(),
-        from: message.getFrom(),
-        to: message.getTo(),
-        date: message.getDate(),
-        body: message.getPlainBody(),
-        attachments: message.getAttachments().map((attachment) => ({
-          name: attachment.getName(),
-          type: attachment.getContentType(),
-          size: attachment.getSize(),
-        })),
-      };
-
-      // Prepare webhook request
-      const options = {
-        method: "POST",
-        contentType: "application/json",
-        headers: {
-          "X-Webhook-Secret": `${WEBHOOK_SECRET}`,
-        },
-        payload: JSON.stringify(emailData),
-        muteHttpExceptions: true,
-      };
-
-      try {
-        // Send to webhook
-        const response = UrlFetchApp.fetch(WEBHOOK_URL, options);
-
-        if (response.getResponseCode() === 200) {
-          console.log(`Successfully forwarded email: ${message.getSubject()}`);
-        } else {
-          console.error(
-            `Failed to forward email: ${message.getSubject()}. Status: ${response.getResponseCode()}`,
-          );
-        }
-      } catch (error) {
-        console.error(
-          `Error forwarding email: ${message.getSubject()}. Error: ${error.toString()}`,
-        );
-      }
+  <summary>Solution</summary>
+    ```typescript
+      const result = await generateObject({
+      model: openai("gpt-4o-2024-08-06", { structuredOutputs: true }),
+      schema,
+      prompt,
     });
-  });
-}
+
+    console.log(JSON.stringify(result.object, null, 2));
+    ```
+
+</details>
+
+# Conceptual overview: Neon Postgres
+
+Neon is a Postgres platform designed to help you build reliable and scalable applications faster. It offers modern developer features such as autoscaling, branching, point-in-time restore, and more. You can sign up for free and get started in minutes.
+
+We'll use Postgres Neon to store the structured data generated by the AI SDK.
+
+# Exercise: Create a Postgres database on Neon
+
+1. Sign up for Neon https://console.neon.tech/signup
+1. Create a Project
+1. Click on the "connect" button to get the database URL
+1. Update the `.env` file with the database URL
+
+```bash
+# .env
+DATABASE_URL=your-database-url
 ```
 
-3. Deployment
+# Drizzle ORM
 
-- Click Deploy > New Deployment
-- Select the deployment type to be `Web app`
-- Click Deploy
-- Click `Authorize access`, You'll see a warning saying the app isn't verified, so choose the "advanced" option and click Go to <your project name> (unsafe) and then Allow.
+Drizzle ORM is a TypeScript ORM for SQL databases. It has three components:
 
-4. Create a trigger
+- drizzle-orm: typescript query builder. It supports both a relational and SQL-like query APIs
+- drizzle-kit: you define a schema in TypeScript, which serves as the source of truth for future modifications in queries and migrations
+- drizzle-studio: data browser and schema editor
 
-- Go back to the Google apps script console and choose "Triggers" from the sidebar
-- Click “Add Trigger”
-- Choose the `processRecentEmails` function
-- Select type of time based trigger to be “Minutes Timer” and have it run every minute
+# Exercise: Defininig schema, storing results in the database and fetching them
 
+```
 
-and that's it! Your Google Apps Script is now set up to forward emails to your webhook endpoint.
+```

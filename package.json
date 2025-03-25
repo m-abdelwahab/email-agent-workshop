@@ -11,8 +11,8 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "db:generate": "drizzle-kit generate --config=src/lib/db/config.ts",
-    "db:migrate": "drizzle-kit migrate --config=src/lib/db/config.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "dev:webhook": "smee --url https://smee.io/4jNHS5eo78bVDtRu --target http://localhost:3000/api/webhooks/email"
   },
   "dependencies": {

@@ -25,11 +25,6 @@ const emailSchema = z.object({
 
 export async function action({ request }: Route.ActionArgs) {
   try {
-    /**The Webhook URL should be https://username:password@yourdomain.com/api/webhooks/agent,
-      1. Postmark will include an Authorization header containing the Base64-encoded username and password.
-      2. The server decodes the credentials and verifies them.
-      3. If the credentials are valid, access is granted; otherwise, the request is denied.
-    **/
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Basic ")) {
@@ -60,11 +55,14 @@ export async function action({ request }: Route.ActionArgs) {
       validatedData,
     )}. The summary should be a 1-2 sentences and only generate 1-2 labels that are relevant to the email.`;
 
+    const schema = z.object({
+      summary: z.string(),
+      labels: z.array(z.string()),
+    });
+
     const result = await generateObject({
       model: openai("gpt-4o-2024-08-06", { structuredOutputs: true }),
-      schemaName: "email",
-      schemaDescription: "An email summary.",
-      schema: z.object({ summary: z.string(), labels: z.array(z.string()) }),
+      schema,
       prompt,
     });
 
@@ -85,7 +83,6 @@ export async function action({ request }: Route.ActionArgs) {
 
     return Response.json(
       {
-        status: "success",
         data: {
           email: validatedData,
           summary: result.object.summary,

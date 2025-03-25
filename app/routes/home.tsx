@@ -13,7 +13,7 @@ export async function loader() {
     return { messages: allMessages };
   } catch (error) {
     console.error("Error fetching messages:", error);
-    return [];
+    throw new Error("Error fetching messages");
   }
 }
 
