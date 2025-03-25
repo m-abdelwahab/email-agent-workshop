@@ -37,9 +37,7 @@ export default async function Home({ loaderData }: Route.ComponentProps) {
           {messages.map((message) => (
             <details
               key={message.id}
-              className={cn(
-                "border-border group rounded-lg border p-4 shadow-md",
-              )}
+              className="border-border group rounded-lg border p-4 shadow-md"
             >
               <summary className="cursor-pointer list-none">
                 <div className="flex items-center gap-2">
