@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { db } from "~/lib/db";
 import { messages } from "~/lib/db/schema";
+import type { Route } from "./+types/email-webhook";
 
 const emailSchema = z.object({
   MessageID: z.string(),
@@ -23,7 +23,7 @@ const emailSchema = z.object({
   ),
 });
 
-export async function POST(request: Request) {
+export async function action({ request }: Route.ActionArgs) {
   try {
     /**The Webhook URL should be https://username:password@yourdomain.com/api/webhooks/agent,
       1. Postmark will include an Authorization header containing the Base64-encoded username and password.
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Basic ")) {
-      return NextResponse.json(
+      return Response.json(
         { error: "Missing signature header" },
         { status: 401 },
       );
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       username !== process.env.WEBHOOK_USERNAME ||
       password !== process.env.WEBHOOK_PASSWORD
     ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -83,19 +83,19 @@ export async function POST(request: Request) {
       })
       .onConflictDoNothing({ target: messages.id });
 
-    return NextResponse.json({
-      status: "success",
-      data: {
-        email: validatedData,
-        summary: result.object.summary,
-        labels: result.object.labels,
+    return Response.json(
+      {
+        status: "success",
+        data: {
+          email: validatedData,
+          summary: result.object.summary,
+          labels: result.object.labels,
+        },
       },
-    });
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Webhook processing error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

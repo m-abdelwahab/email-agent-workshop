@@ -1,26 +1,28 @@
 import { db } from "~/lib/db";
 import { messages } from "~/lib/db/schema";
 import { cn } from "~/lib/utils";
+import type { Route } from "./+types/home";
 
-const getMessages = async () => {
+export async function loader() {
   try {
     const allMessages = await db
       .select()
       .from(messages)
       .orderBy(messages.createdAt);
-    return allMessages;
+
+    return { messages: allMessages };
   } catch (error) {
     console.error("Error fetching messages:", error);
     return [];
   }
-};
+}
 
-export default async function Home() {
-  const messageList = await getMessages();
+export default async function Home({ loaderData }: Route.ComponentProps) {
+  const { messages } = loaderData;
 
   return (
     <div className="mx-auto mt-10 max-w-screen-lg">
-      {messageList.length === 0 ? (
+      {messages.length === 0 ? (
         <div className="flex min-h-screen flex-col items-center justify-center py-10 text-center">
           <h2 className="mb-2 text-xl font-semibold">No messages found</h2>
           <p className="text-muted-foreground">
@@ -29,7 +31,7 @@ export default async function Home() {
         </div>
       ) : (
         <div className="border-border space-y-4 overflow-y-auto">
-          {messageList.map((message) => (
+          {messages.map((message) => (
             <details
               key={message.id}
               className={cn(

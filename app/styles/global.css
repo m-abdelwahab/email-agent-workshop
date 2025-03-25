@@ -3,7 +3,6 @@
   ---break---
 */
 @custom-variant dark (&:is(.dark *));
-@plugin 'tailwindcss-animate';
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -23,6 +22,7 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
 /*
   ---break---
 */
@@ -53,6 +53,7 @@
   --chart-5: hsl(27 87% 67%);
   --radius: 0.6rem;
 }
+
 /*
   ---break---
 */
@@ -82,6 +83,7 @@
   --chart-4: hsl(280 65% 60%);
   --chart-5: hsl(340 75% 55%);
 }
+
 /*
   ---break---
 */
@@ -116,6 +118,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+
   /*
   ---break---
 */
@@ -123,10 +126,12 @@
     from {
       height: 0;
     }
+
     to {
       height: var(--radix-accordion-content-height);
     }
   }
+
   /*
   ---break---
 */
@@ -134,11 +139,13 @@
     from {
       height: var(--radix-accordion-content-height);
     }
+
     to {
       height: 0;
     }
   }
 }
+
 /*
   ---break---
 */
@@ -146,6 +153,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
