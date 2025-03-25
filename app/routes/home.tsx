@@ -5,12 +5,15 @@ import type { Route } from "./+types/home";
 
 export async function loader() {
   try {
-    const allMessages = await db
-      .select()
-      .from(messages)
-      .orderBy(messages.createdAt);
+    // TODO: query the messages table using Drizzle ORM. Use either the SQL-like syntax or the Relational API.
+    // SQL-like syntax docs: https://orm.drizzle.team/docs/select
+    // Relational API docs: https://orm.drizzle.team/docs/rqb#querying
 
-    return { messages: allMessages };
+    const allMessages = []; // Replace empty array with a Drizzle ORM query
+
+    return {
+      messages: [], // TODO: replace with `allMessages`
+    };
   } catch (error) {
     console.error("Error fetching messages:", error);
     throw new Error("Error fetching messages");

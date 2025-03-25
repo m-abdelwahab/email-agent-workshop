@@ -51,32 +51,42 @@ export async function action({ request }: Route.ActionArgs) {
       labels: z.array(z.string()),
     });
 
-    const result = await generateObject({
-      model: openai("gpt-4o-2024-08-06", { structuredOutputs: true }),
-      schema,
-      prompt,
-    });
+    /** EXERCISE: Build an AI workflow
 
-    await db
-      .insert(messages)
-      .values({
-        id: validatedData.MessageID,
-        subject: validatedData.Subject,
-        from: validatedData.From,
-        to: validatedData.To,
-        body: validatedData.TextBody,
-        summary: result.object.summary,
-        labels: result.object.labels,
-        date: validatedData.Date,
-      })
-      .onConflictDoNothing({ target: messages.id });
+    1. Go to [platform.openai.com](https://platform.openai.com) and generate an API Key
+
+    - New account -> generate an API key during onboarding
+    - Existing account -> Settings > API Keys > create new secret key
+
+    2. Update the `.env` file with the API key. The AI SDK by Vercel uses the `OPENAI_API_KEY` environment variable to authenticate with OpenAI.
+
+    ```bash
+    # .env
+    OPENAI_API_KEY=your-api-key
+    ```
+
+    3. Go to the API endpoint in `/app/routes/api/email-webhook.tsx` and use the `generateObject` function to generate a structured output. Use console.log to see the output.
+    `generateObject` docs: https://sdk.vercel.ai/docs/reference/ai-sdk-core/generate-object
+
+    4. Send a test email to your Postmark inbound address. You should see the output in your terminal.
+     */
+
+    const result = {}; // TODO: replace with the generateObject function. Pass the prompt and schema to the generateObject function
+
+    console.log(result);
+
+    /** EXERCISE: Insert the email into the database
+
+    - Use Drizzle ORM to insert the email into the `messages` table
+    - SQL Insert docs: https://orm.drizzle.team/docs/insert
+    */
 
     return Response.json(
       {
         data: {
           email: validatedData,
-          summary: result.object.summary,
-          labels: result.object.labels,
+          summary: null, // TODO: replace with the summary from the `result` object
+          labels: null, // TODO: replace with the labels from the `result` object
         },
       },
       { status: 200 },
